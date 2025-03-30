@@ -1,48 +1,55 @@
-"use client"
+"use client";
+
 import axios from "axios";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 
-export default function verifyEmailPage(){
-    const [token, setToken] = useState("")
-    const [verified, setVerified] = useState(false)
-    const [error, setError] = useState(false)
-
-    const verifyUserEmail = async()=>{
-        try {
-            await axios.post("api/users/verifyEmail",{token})
-            setVerified(true);
-        } catch (error: any) {
-            setError(true);
-            console.log(error.response.data);
-        }
+export default function VerifyEmailPage() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") || "";
+  
+  const [verified, setVerified] = useState(false);
+  const [error, setError] = useState(false);
+  
+  useEffect(() => {
+    if (token) {
+      verifyUserEmail();
     }
-    useEffect(()=>{
-        const urlToken = window.location.search.split("=")[1];
-        setToken(urlToken || "");
-    },[])
-    useEffect(() => {
-      if(token.length > 0){
-        verifyUserEmail();
-      }
-    }, [token])
-    
-    return(
-        <div className="flex justify-center items-center p-2 min-h-screen">
-            <h1 className="text-xl">Verify Email</h1>
-            <h2 className="text-lg bg-amber-600 p-2">{token?`${token}`:"no token"}</h2>
+  }, [token]);
 
-            {verified && (
-                <div className="">
-                    <h2 className="text-xl p-2">Email verified</h2>
-                    <Link href="/login">login</Link>
-                </div>
-            )}
-            {error && (
-                <div className="">
-                    <h2 className="text-xl p-2 text-red-400">Error</h2>
-                </div>
-            )}
-        </div>
-    )
+  const verifyUserEmail = async () => {
+    try {
+      await axios.post("/api/users/verifyEmail", { token });
+      setVerified(true);
+      toast.success("Email verified successfully!");
+    } catch (err: any) {
+      setError(true);
+      toast.error(err.response?.data?.message || "Verification failed");
+    }
+  };
+
+  return (
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-900 text-white px-6">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md text-center">
+        <h1 className="text-2xl font-semibold mb-4">Verify Email</h1>
+
+        {verified ? (
+          <div>
+            <h2 className="text-lg text-green-400 mb-4">Email Verified! 🎉</h2>
+            <Link href="/login">
+              <button className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white font-semibold">
+                Go to Login
+              </button>
+            </Link>
+          </div>
+        ) : error ? (
+          <h2 className="text-lg text-red-400">Verification Failed ❌</h2>
+        ) : (
+          <h2 className="text-lg text-gray-400">Verifying...</h2>
+        )}
+      </div>
+    </div>
+  );
 }
