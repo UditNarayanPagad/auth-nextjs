@@ -2,6 +2,7 @@
 import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const ForgotPasswordPage = () => {
   const [user, setUser] = useState({
@@ -19,10 +20,14 @@ const ForgotPasswordPage = () => {
       setLoading(true);
       await axios.post("api/users/forgotPassword", { token, user });
       setSent(true);
-      setSent2(true);
+      if(token.length > 0){
+        toast.success("Reset password successfull");
+        setSent2(true);
+      }
     } catch (error: any) {
       setError(true);
       console.log(error.response.data);
+      toast.success(error.response.data);
       setSent(false);
       setSent2(false);
     } finally {

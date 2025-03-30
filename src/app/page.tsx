@@ -22,7 +22,6 @@ const Dashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white">
-      {/* Sidebar */}
       <aside className="w-64 bg-gray-800 p-6 flex flex-col">
         <h2 className="text-xl font-bold text-center mb-6">Dashboard</h2>
         <nav className="flex flex-col gap-4">
